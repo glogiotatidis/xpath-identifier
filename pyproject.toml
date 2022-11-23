@@ -1,6 +1,6 @@
 [project]
-name = "xpath-identifier"
-version = "0.0.1"
+name = "xpath_identifier"
+version = "0.0.2"
 authors = [
   { name="Dev Tanna", email="dev.tanna@gmail.com" },
 ]
