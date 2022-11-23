@@ -1,0 +1,30 @@
+[project]
+name = "xpath-identifier"
+version = "0.0.1"
+authors = [
+  { name="Dev Tanna", email="dev.tanna@gmail.com" },
+]
+description = "Identify Xpath expressions in a given document"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["xpath", "identifier", "parser"]
+
+[project.urls]
+"Homepage" = "https://github.com/devtanna/xpath-identifier"
+"Bug Tracker" = "https://github.com/devtanna/xpath-identifier/issues"
+
+[build-system]
+requires = [
+    "setuptools>=45",
+    "setuptools_scm[toml]>=6.2",
+    "bs4==0.0.1",
+    "lxml==4.9.1",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
