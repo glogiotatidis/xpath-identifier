@@ -1,10 +1,8 @@
-import re
 from bs4 import BeautifulSoup
 from bs4 import Tag
 from typing import List, Optional
 from email.parser import Parser
 from email.policy import default as default_policy
-
 
 def search_email(email: str, search_text: str) -> List[Optional[str]]:
     """
@@ -12,23 +10,41 @@ def search_email(email: str, search_text: str) -> List[Optional[str]]:
     @param text: text to search
     @return xpath:
     """
-    xpaths = []
-    msg = Parser(policy=default_policy).parsestr(email)
-    html_body = msg.get_body(preferencelist=("html")).get_content()
+    html_body = _get_html_body_from_email(email)
     return search_html(html_body, search_text)
 
-def search_html(text: str, search_text: str) -> List[Optional[str]]:
+def search_html(html: str, search_text: str) -> List[Optional[str]]:
     """
     Searches for xpath of input text
     @param text: text to search
     @return xpath:
     """
     xpaths = []
-    soup = BeautifulSoup(text, "html.parser")
-    soup_tag = _extract_soup_tag_from_soup(soup, search_text)
-    if soup_tag:
-        xpaths.append(_generate_xpath(soup_tag))
+    soup = _get_html_soup(html)
+    soup_tags = _extract_soup_tags_from_soup(soup, search_text)
+    if soup_tags:
+        for soup_tag in soup_tags:
+            # TODO: validate xpaths before appending
+            # TODO: handle multiple child & parent xpaths
+            xpaths.append(_generate_xpath(soup_tag))
     return xpaths
+
+def _get_html_body_from_email(email: str) -> str:
+    """
+    Gets the html body from the email.
+    :param email: The email.
+    :return: The html body.
+    """
+    msg = Parser(policy=default_policy).parsestr(email)
+    return msg.get_body(preferencelist=("html")).get_content()
+
+def _get_html_soup(html: str) -> BeautifulSoup:
+    """
+    Gets the html soup.
+    :param html: The html.
+    :return: The soup object.
+    """
+    return BeautifulSoup(html, "html.parser")
 
 def _generate_xpath(element: Tag) -> str:
     """
@@ -49,32 +65,18 @@ def _generate_xpath(element: Tag) -> str:
     components.reverse()
     return f"/{'/'.join(components)}"
 
-def _extract_soup_tag_from_soup(html_soup: BeautifulSoup, text: str) -> Optional[Tag]:
+def _extract_soup_tags_from_soup(html_soup: BeautifulSoup, text: str) -> List[Optional[Tag]]:
     """
-    Extracts a soup tag from the text.
+    Extracts all soup tags from the text.
     :param html_soup: The soup object.
     :param text: The text to search for.
     :return: The soup tag or None.
     """
-    soup_tag = html_soup.find(lambda tag: text in tag.text, text=True)
+    soup_text_tags = html_soup.find_all(lambda tag: text in tag.text, string=True) or []
 
-    if not soup_tag:
-        # soup tag was not found searching in text,
-        # let's try to search for it in the tag attributes
-        soup_tag = html_soup.find(
-            lambda tag: any(text in x for x in tag.attrs.values())
-        )
+    # let's try to search for it in the tag attributes
+    soup_attr_tag = html_soup.find_all(
+        lambda tag: any(text in x for x in tag.attrs.values())
+    ) or []
 
-    return soup_tag
-
-def validate_xpath(xpath:str, text: str, target_text: str) -> bool:
-    """
-    Validates xpath
-    @param xpath: xpath to validate
-    @param text: text to search in
-    @param target_text: text to search for
-    @return bool:
-    """
-    soup = BeautifulSoup(text, "html.parser")
-    return bool(soup.select_one(xpath))
-
+    return soup_text_tags + soup_attr_tag

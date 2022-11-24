@@ -1,8 +1,12 @@
 [project]
 name = "xpath_identifier"
-version = "0.0.2"
+version = "0.0.4"
 authors = [
   { name="Dev Tanna", email="dev.tanna@gmail.com" },
+]
+dependencies = [
+    "beautifulsoup4==4.11.1",
+    "lxml==4.9.1",
 ]
 description = "Identify Xpath expressions in a given document"
 readme = "README.md"
@@ -22,8 +26,6 @@ keywords = ["xpath", "identifier", "parser"]
 requires = [
     "setuptools>=45",
     "setuptools_scm[toml]>=6.2",
-    "bs4==0.0.1",
-    "lxml==4.9.1",
 ]
 build-backend = "setuptools.build_meta"
 
