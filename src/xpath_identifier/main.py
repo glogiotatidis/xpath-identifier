@@ -13,7 +13,7 @@ def search_email(email: str, search_text: str) -> List[Optional[str]]:
     html_body = _get_html_body_from_email(email)
     return search_html(html_body, search_text)
 
-def search_html(html: str, search_text: str) -> List[Optional[str]]:
+def search_html(html: str, search_text: str, search_attr_values: bool=False) -> List[Optional[str]]:
     """
     Searches for xpath of input text
     @param text: text to search
@@ -21,7 +21,7 @@ def search_html(html: str, search_text: str) -> List[Optional[str]]:
     """
     xpaths = []
     soup = _get_html_soup(html)
-    soup_tags = _extract_soup_tags_from_soup(soup, search_text)
+    soup_tags = _extract_soup_tags_from_soup(soup, search_text, search_attr_values)
     if soup_tags:
         for soup_tag in soup_tags:
             # TODO: validate xpaths before appending
@@ -65,7 +65,7 @@ def _generate_xpath(element: Tag) -> str:
     components.reverse()
     return f"/{'/'.join(components)}"
 
-def _extract_soup_tags_from_soup(html_soup: BeautifulSoup, text: str) -> List[Optional[Tag]]:
+def _extract_soup_tags_from_soup(html_soup: BeautifulSoup, text: str, search_attr_values) -> List[Optional[Tag]]:
     """
     Extracts all soup tags from the text.
     :param html_soup: The soup object.
@@ -74,9 +74,10 @@ def _extract_soup_tags_from_soup(html_soup: BeautifulSoup, text: str) -> List[Op
     """
     soup_text_tags = html_soup.find_all(lambda tag: text in tag.text, string=True) or []
 
-    # let's try to search for it in the tag attributes
-    soup_attr_tag = html_soup.find_all(
-        lambda tag: any(text in x for x in tag.attrs.values())
-    ) or []
+    soup_attr_tags = []
+    if search_attr_values:
+        soup_attr_tags = html_soup.find_all(
+            lambda tag: any(text in x for x in tag.attrs.values())
+        ) or []
 
-    return soup_text_tags + soup_attr_tag
+    return soup_text_tags + soup_attr_tags
