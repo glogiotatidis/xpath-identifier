@@ -104,4 +104,10 @@ def _extract_soup_tags_from_soup(html_soup: BeautifulSoup, text: str, search_att
             lambda tag: any(text in x for x in tag.attrs.values())
         ) or []
 
-    return soup_text_tags + soup_attr_tags
+    elms = []
+    for element in soup_text_tags + soup_attr_tags:
+        while isinstance(element, NavigableString):
+            element = element.parent
+        elms.append(element)
+
+    return elms
