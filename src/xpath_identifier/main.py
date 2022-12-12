@@ -27,7 +27,7 @@ def search_html(html: str, search_text: str, search_attr_values: bool=False, htm
         for soup_tag in soup_tags:
             # TODO: validate xpaths before appending
             # TODO: handle multiple child & parent xpaths
-            results.append((soup_tag, _generate_xpath(soup_tag)))
+            results.append((soup_tag, generate_xpath(soup_tag)))
     return results
 
 def find_closest_tag(soup_tag: Tag, tag_name: str) -> List[Tuple[Optional[Tag], Optional[str]]]:
@@ -44,8 +44,8 @@ def find_closest_tag(soup_tag: Tag, tag_name: str) -> List[Tuple[Optional[Tag], 
     # TODO: handle and return the closest match
 
     return [
-        (prev_match, _generate_xpath(prev_match)),
-        (next_match, _generate_xpath(next_match))
+        (prev_match, generate_xpath(prev_match)),
+        (next_match, generate_xpath(next_match))
     ]
 
 def _get_html_body_from_email(email: str) -> str:
@@ -65,7 +65,7 @@ def _get_html_soup(html: str) -> BeautifulSoup:
     """
     return BeautifulSoup(html, "lxml")
 
-def _generate_xpath(element: Tag) -> str:
+def generate_xpath(element: Tag) -> str:
     """
     Finds the xpath of the given element
     @param element: Soup element
