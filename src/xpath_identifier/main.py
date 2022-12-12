@@ -1,6 +1,7 @@
 import regex as re
 from bs4 import BeautifulSoup
 from bs4 import Tag
+from bs4.element import NavigableString
 from typing import List, Optional, Tuple
 from email.parser import Parser
 from email.policy import default as default_policy
